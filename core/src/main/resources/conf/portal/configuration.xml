@@ -28,5 +28,9 @@
   <component>
     <type>org.gatein.portal.injector.navigation.NavigationDataInjector</type>
   </component>
+  
+  <component>
+    <type>org.gatein.portal.injector.navigation.PageDataInjector</type>
+  </component>
 
 </configuration>
