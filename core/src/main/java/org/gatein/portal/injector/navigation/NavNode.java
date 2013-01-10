@@ -20,6 +20,9 @@ package org.gatein.portal.injector.navigation;
 
 import org.exoplatform.portal.mop.navigation.NodeContext;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A model simpler than UserNode
@@ -31,9 +34,19 @@ public class NavNode
 {
    /*package*/ NodeContext<NavNode> context;
 
+   private int depth = -1;
+
+   private LinkedList<String> path;
+
    public NavNode(NodeContext<NavNode> _context)
    {
       context = _context;
+   }
+
+   public NavNode getParent()
+   {
+      NodeContext<NavNode> ctx = context.getParent();
+      return ctx == null ? null : ctx.getNode();
    }
 
    public NavNode getChild(String name)
@@ -65,5 +78,50 @@ public class NavNode
    public int getSize()
    {
       return context.getSize();
+   }
+
+   public int getDepth()
+   {
+      if (depth < 0)
+      {
+         depth = getPath().size();
+      }
+      return depth;
+   }
+
+   public LinkedList<String> getPath()
+   {
+      if (path == null)
+      {
+         LinkedList<String> tmp = new LinkedList<String>();
+         for(NavNode node = this; node != null; node = node.getParent())
+         {
+            tmp.addFirst(node.context.getName());
+         }
+         path = tmp;
+      }
+      return path;
+   }
+
+   /**
+    * Search for a descendant node matching given relativePath, the method might return null if:
+    *
+    * 1. There 's no node in reality that matches path
+    *
+    * 2. The Scope passed to NavigationService.load method does not allow to load all necessary node
+    *
+    * @param relativePath
+    * @return
+    */
+   public NavNode getDescendant(String[] relativePath)
+   {
+      NavNode tmp = this;
+      int depth = 0;
+      while(tmp != null && depth < relativePath.length)
+      {
+         tmp = tmp.getChild(relativePath[depth]);
+         depth++;
+      }
+      return tmp;
    }
 }

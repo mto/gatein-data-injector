@@ -203,6 +203,49 @@ public class NavigationDataInjector implements Startable
       }
    }
 
+   /**
+    *
+    * @param navType
+    * @param navOwner
+    * @param absolutePath path from root to targeted node
+    * @param nodePrefix
+    * @param startIndex
+    * @param endIndex
+    */
+   public void addNodes(String navType, String navOwner, String absolutePath, String nodePrefix, int startIndex, int endIndex)
+   {
+      SiteKey key = new SiteKey(navType, navOwner);
+      NavigationContext navCtx = navService.loadNavigation(key);
+      if (navCtx == null)
+      {
+         LOG.error("Navigation type= " + navType + " , owner= " + navOwner + " does not exist");
+      }
+      else
+      {
+         //TODO: Scope.ALL degrads performance, wait for better solution with improve of Scope.Visitor API
+         NavNode rootNode = navService.loadNode(new NavNodeModel(), navCtx, Scope.ALL, null).getNode();
+         NavNode targetNode = rootNode.getDescendant(absolutePath.split("/"));
+         if (targetNode == null)
+         {
+            LOG.error("Could not find node specified by path " + absolutePath + " under navigation type= " + navType + " , owner= " + navOwner);
+         }
+         else
+         {
+            int index = targetNode.getSize();
+            for (int i = startIndex; i < endIndex; i++)
+            {
+               String nodeName = nodePrefix + "_" + i;
+               if (targetNode.getChild(nodeName) == null)
+               {
+                  targetNode.addChild(index, nodeName);
+                  index++;
+               }
+            }
+            navService.saveNode(targetNode.context, null);
+         }
+      }
+   }
+
    @Managed
    @ManagedDescription("Create new navigation")
    @Impact(ImpactType.WRITE)
@@ -230,7 +273,7 @@ public class NavigationDataInjector implements Startable
    }
 
    @Managed
-   @ManagedDescription("Add nodes into existing navigation")
+   @ManagedDescription("Add nodes into root node of existing navigation")
    @Impact(ImpactType.WRITE)
    public void insertNodes(@ManagedDescription("Type of target navigation") @ManagedName("navType") String navType,
                            @ManagedDescription("Owner of target navigation") @ManagedName("navOwner") String navOwner,
@@ -255,4 +298,30 @@ public class NavigationDataInjector implements Startable
       }
    }
 
+   @Managed
+   @ManagedDescription("Add nodes into node specified by path in existing navigation")
+   @Impact(ImpactType.WRITE)
+   public void insertNodes(@ManagedDescription("Type of target navigation") @ManagedName("navType") String navType,
+                           @ManagedDescription("Owner of target navigation") @ManagedName("navOwner") String navOwner,
+                           @ManagedDescription("Path from root to target node") @ManagedName("absolutePath") String absolutePath,
+                           @ManagedDescription("Prefix of new node names") @ManagedName("prefix") String nodePrefix,
+                           @ManagedDescription("Starting index") @ManagedName("startIndex") int startIndex,
+                           @ManagedDescription("Ending index") @ManagedName("endIndex") int endIndex)
+   {
+      //Invoke from JMX bean will not go through GateIn's servlet filter. Therefore, we need to open/close transaction
+      PortalContainer pc = RootContainer.getInstance().getPortalContainer("portal");
+      try
+      {
+         RequestLifeCycle.begin(pc);
+         addNodes(navType, navOwner, absolutePath, nodePrefix, startIndex, endIndex);
+      }
+      catch (Exception ex)
+      {
+         LOG.error("Failed to insert new nodes", ex);
+      }
+      finally
+      {
+         RequestLifeCycle.end();
+      }
+   }
 }
