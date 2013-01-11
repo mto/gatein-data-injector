@@ -22,8 +22,6 @@
 
 package org.gatein.portal.injector.page;
 
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.management.annotations.Impact;
 import org.exoplatform.management.annotations.ImpactType;
 import org.exoplatform.management.annotations.Managed;
@@ -39,55 +37,64 @@ import org.exoplatform.portal.mop.page.PageService;
 import org.exoplatform.portal.mop.page.PageState;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
-import org.picocontainer.Startable;
-
+import org.gatein.portal.injector.AbstractInjector;
 import java.util.Collections;
 
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Hai Thanh Nguyen</a>
  * @version $Id$
- * 
+ *
  */
 
 @Managed
 @ManagedDescription("Page data injector")
-@NameTemplate({ @Property(key = "view", value = "portal"), @Property(key = "service", value = "pageInjector"),
-        @Property(key = "type", value = "pageInject") })
+@NameTemplate({@Property(key = "view", value = "portal"), @Property(key = "service", value = "pageInjector"),
+   @Property(key = "type", value = "pageInject")})
 @RESTEndpoint(path = "pageInjector")
-public class PageDataInjector implements Startable {
+public class PageDataInjector extends AbstractInjector
+{
+   private static Logger LOG = LoggerFactory.getLogger(PageDataInjector.class);
 
-    private static Logger LOG = LoggerFactory.getLogger(PageDataInjector.class);
+   private PageService pageService;
 
-    public void start() {
-    }
+   public PageDataInjector(PageService _pageService)
+   {
+      pageService = _pageService;
+   }
 
-    public void stop() {
-    }
+   @Override
+   public Logger getLogger()
+   {
+      return LOG;
+   }
 
-    @Managed
-    @ManagedDescription("Create new pages")
-    @Impact(ImpactType.WRITE)
-    public void createPages(@ManagedName("siteType") String type, @ManagedName("siteName") String name,
-            @ManagedName("pageNamePrefix") String pageNamePrefix, @ManagedName("pageTitlePrefix") String pageTitlePrefix,
-            @ManagedDescription("Starting index") @ManagedName("startIndex") int startIndex,
-            @ManagedDescription("Ending index") @ManagedName("endIndex") int endIndex) {
-
-        PortalContainer pc = PortalContainer.getInstance();
-        PageService service = (PageService) pc.getComponentInstanceOfType(PageService.class);
-        try {
-            RequestLifeCycle.begin(pc);
-            SiteType siteType = SiteType.valueOf(type.toUpperCase());
-            SiteKey siteKey = siteType.key(name);
-            for (int i = startIndex; i < endIndex; i++) {
-                PageContext page = new PageContext(siteKey.page(pageNamePrefix + "_" + i), new PageState(pageTitlePrefix + "_"
-                        + i, null, true, null, Collections.<String> emptyList(), null));
-                service.savePage(page);
-            }
-        } catch (Exception e) {
-            LOG.error("Failed to create new page", e);
-        } finally {
-            RequestLifeCycle.end();
-        }
-
-    }
+   @Managed
+   @ManagedDescription("Create new pages")
+   @Impact(ImpactType.WRITE)
+   public void createPages(@ManagedName("siteType") String type, @ManagedName("siteName") String name,
+                           @ManagedName("pageNamePrefix") String pageNamePrefix, @ManagedName("pageTitlePrefix") String pageTitlePrefix,
+                           @ManagedDescription("Starting index") @ManagedName("startIndex") int startIndex,
+                           @ManagedDescription("Ending index") @ManagedName("endIndex") int endIndex)
+   {
+      try
+      {
+         startTransaction();
+         SiteType siteType = SiteType.valueOf(type.toUpperCase());
+         SiteKey siteKey = siteType.key(name);
+         for (int i = startIndex; i < endIndex; i++)
+         {
+            PageContext page = new PageContext(siteKey.page(pageNamePrefix + "_" + i), new PageState(pageTitlePrefix + "_"
+               + i, null, true, null, Collections.<String>emptyList(), null));
+            pageService.savePage(page);
+         }
+      }
+      catch (Exception e)
+      {
+         LOG.error("Failed to create new page", e);
+      }
+      finally
+      {
+         endTransaction();
+      }
+   }
 }

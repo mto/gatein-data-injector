@@ -18,10 +18,6 @@
  */
 package org.gatein.portal.injector.navigation;
 
-import org.exoplatform.container.ExoContainerContext;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.RootContainer;
-import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.management.annotations.Impact;
 import org.exoplatform.management.annotations.ImpactType;
 import org.exoplatform.management.annotations.Managed;
@@ -40,7 +36,7 @@ import org.exoplatform.portal.mop.navigation.NavigationState;
 import org.exoplatform.portal.mop.navigation.Scope;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
-import org.picocontainer.Startable;
+import org.gatein.portal.injector.AbstractInjector;
 import java.util.List;
 
 /**
@@ -51,15 +47,13 @@ import java.util.List;
 @ManagedDescription("Navigation data injector")
 @NameTemplate({@Property(key = "view", value = "portal"), @Property(key = "service", value = "navigationInjector"), @Property(key = "type", value = "navdataInject")})
 @RESTEndpoint(path = "navInjector")
-public class NavigationDataInjector implements Startable
+public class NavigationDataInjector extends AbstractInjector
 {
    private static Logger LOG = LoggerFactory.getLogger(NavigationDataInjector.class);
 
    private NavigationServiceWrapper navService;
 
    private DataStorage dataStorage;
-
-   private PortalContainer portalContainer;
 
    public NavigationDataInjector(NavigationServiceWrapper _navService, DataStorage _dataStorage)
    {
@@ -68,15 +62,9 @@ public class NavigationDataInjector implements Startable
    }
 
    @Override
-   public void start()
+   public Logger getLogger()
    {
-      LOG.info("Set portal container on actual service instance");
-      portalContainer = (PortalContainer)ExoContainerContext.getCurrentContainer();
-   }
-
-   @Override
-   public void stop()
-   {
+      return LOG;
    }
 
    public void createNavigation(String type, String owner, List<String> children)
@@ -264,7 +252,7 @@ public class NavigationDataInjector implements Startable
       //Invoke from JMX bean will not go through GateIn's servlet filter. Therefore, we need to open/close transaction
       try
       {
-         RequestLifeCycle.begin(portalContainer);
+         startTransaction();
          createNavigation(type, owner, prefix, startIndex, endIndex);
       }
       catch (Exception ex)
@@ -273,7 +261,7 @@ public class NavigationDataInjector implements Startable
       }
       finally
       {
-         RequestLifeCycle.end();
+         endTransaction();
       }
    }
 
@@ -289,7 +277,7 @@ public class NavigationDataInjector implements Startable
       //Invoke from JMX bean will not go through GateIn's servlet filter. Therefore, we need to open/close transaction
       try
       {
-         RequestLifeCycle.begin(portalContainer);
+         startTransaction();
          addNodes(navType, navOwner, nodePrefix, startIndex, endIndex);
       }
       catch (Exception ex)
@@ -298,7 +286,7 @@ public class NavigationDataInjector implements Startable
       }
       finally
       {
-         RequestLifeCycle.end();
+         endTransaction();
       }
    }
 
@@ -315,7 +303,7 @@ public class NavigationDataInjector implements Startable
       //Invoke from JMX bean will not go through GateIn's servlet filter. Therefore, we need to open/close transaction
       try
       {
-         RequestLifeCycle.begin(portalContainer);
+         startTransaction();
          addNodes(navType, navOwner, absolutePath, nodePrefix, startIndex, endIndex);
       }
       catch (Exception ex)
@@ -324,7 +312,7 @@ public class NavigationDataInjector implements Startable
       }
       finally
       {
-         RequestLifeCycle.end();
+         endTransaction();
       }
    }
 }
