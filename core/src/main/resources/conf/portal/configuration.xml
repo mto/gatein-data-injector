@@ -32,5 +32,9 @@
   <component>
     <type>org.gatein.portal.injector.page.PageDataInjector</type>
   </component>
+  
+  <component>
+    <type>org.gatein.portal.injector.user.UserDataInjector</type>
+  </component>
 
 </configuration>
