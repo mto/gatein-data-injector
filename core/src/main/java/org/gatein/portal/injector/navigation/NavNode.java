@@ -75,6 +75,11 @@ public class NavNode
       return context.removeNode(name);
    }
 
+   public void remove()
+   {
+      context.remove();
+   }
+
    public int getSize()
    {
       return context.getSize();

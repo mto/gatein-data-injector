@@ -33,6 +33,7 @@ import org.exoplatform.portal.mop.navigation.GenericScope;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NavigationServiceWrapper;
 import org.exoplatform.portal.mop.navigation.NavigationState;
+import org.exoplatform.portal.mop.navigation.NodeContext;
 import org.exoplatform.portal.mop.navigation.Scope;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
@@ -309,6 +310,35 @@ public class NavigationDataInjector extends AbstractInjector
       catch (Exception ex)
       {
          LOG.error("Failed to insert new nodes", ex);
+      }
+      finally
+      {
+         endTransaction();
+      }
+   }
+
+   @Managed
+   @ManagedDescription("Delete node specified by path in existing navigation")
+   public void deleteNode(String navType, String navOwner, String pathFromRoot)
+   {
+      try
+      {
+         startTransaction();
+         NavigationContext ctx = navService.loadNavigation(new SiteKey(navType, navOwner));
+         if (ctx == null)
+         {
+            LOG.error("Navigation type= " + navType + " , owner= " + navOwner + " does not exist");
+         }
+         else
+         {
+            String[] path = pathFromRoot.split("/");
+            NavNode rootNode = navService.loadNode(new NavNodeModel(), ctx, GenericScope.branchShape(path), null).getNode();
+            NavNode targetNode = rootNode.getDescendant(path);
+            if (targetNode != null && targetNode != rootNode)
+            {
+               targetNode.remove();
+            }
+         }
       }
       finally
       {
