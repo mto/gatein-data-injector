@@ -43,6 +43,9 @@ import java.util.Collections;
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Hai Thanh Nguyen</a>
  * @version $Id$
+ * 
+ * The <code>PageDataInjector</code> class represents service generating and injecting page to GateIn.
+ * The service can be accessed via JMX (MBean: exo/pageInject/pageInjector) or REST
  *
  */
 
@@ -68,13 +71,37 @@ public class PageDataInjector extends AbstractInjector
       return LOG;
    }
 
+   /**
+    * Generate and inject pages to specified site
+    * 
+    * @param type 
+    * The type of site (ex: portal, group, user)
+    * 
+    * @param name
+    * The name of site
+    * 
+    * @param pageNamePrefix
+    * The prefix name for page
+    * 
+    * @param pageTitlePrefix
+    * The prefix title for page
+    * 
+    * @param startIndex
+    * The start of index to identify page
+    * 
+    * @param endIndex
+    * The end of index
+    */
    @Managed
    @ManagedDescription("Create new pages")
    @Impact(ImpactType.WRITE)
-   public void createPages(@ManagedName("siteType") String type, @ManagedName("siteName") String name,
-                           @ManagedName("pageNamePrefix") String pageNamePrefix, @ManagedName("pageTitlePrefix") String pageTitlePrefix,
-                           @ManagedDescription("Starting index") @ManagedName("startIndex") int startIndex,
-                           @ManagedDescription("Ending index") @ManagedName("endIndex") int endIndex)
+   public void createPages(
+           @ManagedDescription("Site type of page") @ManagedName("siteType") String type, 
+           @ManagedDescription("Site name of page") @ManagedName("siteName") String name,
+           @ManagedDescription("Page name prefix") @ManagedName("pageNamePrefix") String pageNamePrefix, 
+           @ManagedDescription("Page title prefix") @ManagedName("pageTitlePrefix") String pageTitlePrefix,
+           @ManagedDescription("Starting index") @ManagedName("startIndex") int startIndex,
+           @ManagedDescription("Ending index") @ManagedName("endIndex") int endIndex)
    {
       try
       {
