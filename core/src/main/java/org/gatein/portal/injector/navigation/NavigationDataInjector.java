@@ -18,6 +18,7 @@
  */
 package org.gatein.portal.injector.navigation;
 
+import org.exoplatform.container.ExoContainerContext;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
@@ -58,6 +59,8 @@ public class NavigationDataInjector implements Startable
 
    private DataStorage dataStorage;
 
+   private PortalContainer portalContainer;
+
    public NavigationDataInjector(NavigationServiceWrapper _navService, DataStorage _dataStorage)
    {
       navService = _navService;
@@ -67,6 +70,8 @@ public class NavigationDataInjector implements Startable
    @Override
    public void start()
    {
+      LOG.info("Set portal container on actual service instance");
+      portalContainer = (PortalContainer)ExoContainerContext.getCurrentContainer();
    }
 
    @Override
@@ -257,10 +262,9 @@ public class NavigationDataInjector implements Startable
                           @ManagedDescription("Ending index") @ManagedName("endIndex") int endIndex)
    {
       //Invoke from JMX bean will not go through GateIn's servlet filter. Therefore, we need to open/close transaction
-      PortalContainer pc = RootContainer.getInstance().getPortalContainer("portal");
       try
       {
-         RequestLifeCycle.begin(pc);
+         RequestLifeCycle.begin(portalContainer);
          createNavigation(type, owner, prefix, startIndex, endIndex);
       }
       catch (Exception ex)
@@ -283,10 +287,9 @@ public class NavigationDataInjector implements Startable
                            @ManagedDescription("Ending index") @ManagedName("endIndex") int endIndex)
    {
       //Invoke from JMX bean will not go through GateIn's servlet filter. Therefore, we need to open/close transaction
-      PortalContainer pc = RootContainer.getInstance().getPortalContainer("portal");
       try
       {
-         RequestLifeCycle.begin(pc);
+         RequestLifeCycle.begin(portalContainer);
          addNodes(navType, navOwner, nodePrefix, startIndex, endIndex);
       }
       catch (Exception ex)
@@ -310,10 +313,9 @@ public class NavigationDataInjector implements Startable
                            @ManagedDescription("Ending index") @ManagedName("endIndex") int endIndex)
    {
       //Invoke from JMX bean will not go through GateIn's servlet filter. Therefore, we need to open/close transaction
-      PortalContainer pc = RootContainer.getInstance().getPortalContainer("portal");
       try
       {
-         RequestLifeCycle.begin(pc);
+         RequestLifeCycle.begin(portalContainer);
          addNodes(navType, navOwner, absolutePath, nodePrefix, startIndex, endIndex);
       }
       catch (Exception ex)
