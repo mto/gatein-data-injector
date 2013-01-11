@@ -30,7 +30,7 @@
   </component>
   
   <component>
-    <type>org.gatein.portal.injector.navigation.PageDataInjector</type>
+    <type>org.gatein.portal.injector.page.PageDataInjector</type>
   </component>
 
 </configuration>
