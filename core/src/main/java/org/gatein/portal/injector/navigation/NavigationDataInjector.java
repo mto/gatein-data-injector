@@ -32,6 +32,7 @@ import org.exoplatform.management.rest.annotations.RESTEndpoint;
 import org.exoplatform.portal.config.DataStorage;
 import org.exoplatform.portal.config.model.PortalConfig;
 import org.exoplatform.portal.mop.SiteKey;
+import org.exoplatform.portal.mop.navigation.GenericScope;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NavigationServiceWrapper;
 import org.exoplatform.portal.mop.navigation.NavigationState;
@@ -222,9 +223,9 @@ public class NavigationDataInjector implements Startable
       }
       else
       {
-         //TODO: Scope.ALL degrads performance, wait for better solution with improve of Scope.Visitor API
-         NavNode rootNode = navService.loadNode(new NavNodeModel(), navCtx, Scope.ALL, null).getNode();
-         NavNode targetNode = rootNode.getDescendant(absolutePath.split("/"));
+         String[] path = absolutePath.split("/");
+         NavNode rootNode = navService.loadNode(new NavNodeModel(), navCtx, GenericScope.branchShape(path), null).getNode();
+         NavNode targetNode = rootNode.getDescendant(path);
          if (targetNode == null)
          {
             LOG.error("Could not find node specified by path " + absolutePath + " under navigation type= " + navType + " , owner= " + navOwner);
