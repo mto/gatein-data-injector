@@ -37,4 +37,8 @@
     <type>org.gatein.portal.injector.user.UserDataInjector</type>
   </component>
 
+  <component>
+    <type>org.gatein.portal.injector.group.GroupDataInjector</type>
+  </component>
+  
 </configuration>

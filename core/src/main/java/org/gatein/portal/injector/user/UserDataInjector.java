@@ -14,12 +14,12 @@ import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.portal.injector.AbstractInjector;
 
+
 @Managed
 @ManagedDescription("User data injector")
 @NameTemplate({@Property(key = "view", value = "portal")
-   , @Property(key = "service", value = "userInjector")
-   , @Property(key = "type", value = "userDataInject")
-})
+               ,@Property(key = "service", value = "userInjector")
+               ,@Property(key = "type", value = "userDataInject")})
 @RESTEndpoint(path = "userInjector")
 public class UserDataInjector extends AbstractInjector
 {
@@ -31,8 +31,7 @@ public class UserDataInjector extends AbstractInjector
    {
       this.orgService = orgService;
    }
-
-   @Override
+   
    public Logger getLogger()
    {
       return LOG;
@@ -71,86 +70,87 @@ public class UserDataInjector extends AbstractInjector
    @Managed
    @ManagedDescription("Create amount of new users")
    @Impact(ImpactType.WRITE)
-   public void createListUsers(@ManagedDescription("user name") @ManagedName("userName") String userName,
-                               @ManagedDescription("amount of user need to create") @ManagedName("amount") int amount,
-                               @ManagedDescription("if not specific it will be default 123456") @ManagedName("password") String password,
-                               @ManagedDescription("if amount > 1 email will be automatically asigned") @ManagedName("email") String email,
-                               @ManagedDescription("first name") @ManagedName("firstName") String firstName,
-                               @ManagedDescription("last name") @ManagedName("lastName") String lastName)
+   public void createListUsers(@ManagedDescription("user name") @ManagedName("userName") String userName
+      ,@ManagedDescription("amount of users need to create") @ManagedName("amount") int amount
+      ,@ManagedDescription("if not specific it will be default 123456") @ManagedName("password") String password
+      ,@ManagedDescription("if amount > 1 email will be automatically asigned") @ManagedName("email") String email
+      ,@ManagedDescription("first name") @ManagedName("firstName") String firstName
+      ,@ManagedDescription("last name") @ManagedName("lastName") String lastName)
    {
+      startTransaction();
       try
       {
-         startTransaction();
-         if (amount > 1)
+         if (amount < 1)
          {
-            for (int i = 0; i < amount; i++)
-            {
-               String userNameTemp = userName + "_" + i;
-               if (password == null || password.trim().length() == 0)
-               {
-                  password = new String("123456");
-               }
-               email = new String(userNameTemp + "@localhost");
-               if (firstName == null || firstName.trim().length() == 0)
-               {
-                  firstName = userNameTemp;
-               }
-               if (lastName == null || lastName.trim().length() == 0)
-               {
-                  lastName = userNameTemp;
-               }
-               createUser(userNameTemp, password, email, firstName.trim(), lastName.trim());
-            }
+            throw new Exception("amount must great than 0");
          }
-         else
+
+         if (userName == null || userName.trim().length() == 0)
          {
-            if (!email.contains("@"))
+            throw new Exception("userName cannot be null or empty");
+         }
+
+         for (int i = 0; i < amount; i++)
+         {
+            String userNameTemp = (amount == 1) ? userName : userName + "_" + i;
+            if (password == null || password.trim().length() == 0)
             {
-               email = email + "@localhost";
+               password = new String("123456");
+            }
+            if (email == null || email.trim().length() == 0 || amount > 1)
+            {
+               email = new String(userNameTemp + "@localhost");
             }
             if (firstName == null || firstName.trim().length() == 0)
             {
-               firstName = userName;
+               firstName = userNameTemp;
             }
             if (lastName == null || lastName.trim().length() == 0)
             {
-               lastName = userName;
+               lastName = userNameTemp;
             }
-
-            createUser(userName, password, email, firstName.trim(), lastName.trim());
+            createUser(userNameTemp.trim(), password.trim(), email.trim(), firstName.trim(), lastName.trim());
          }
+      }
+      catch (Exception e)
+      {
+         LOG.error(e.getMessage());
       }
       finally
       {
          endTransaction();
       }
+
    }
 
    @Managed
    @ManagedDescription("remove amount of users")
    @Impact(ImpactType.WRITE)
-   public void removeListUsers(@ManagedDescription("user name") @ManagedName("userName") String userName,
-                               @ManagedDescription("list of userName_i need to remove with i form 0 to amount") @ManagedName("amount") int amount)
+   public void removeListUsers(@ManagedDescription("user name") @ManagedName("userName") String userName
+      ,@ManagedDescription("list of userName_i need to remove with i form 0 to amount") @ManagedName("amount") int amount)
    {
+      startTransaction();
       try
       {
-         startTransaction();
-         if (amount > 1)
+         if (userName == null || userName.trim().length() == 0)
          {
-            for (int i = 0; i < amount; i++)
-            {
-               String userNameTemp = userName + "_" + i;
-               orgService.getUserHandler().removeUser(userNameTemp, true);
-            }
+            throw new Exception("userName cannot be null or empty");
          }
-         else
+
+         if (amount < 1)
          {
-            orgService.getUserHandler().removeUser(userName, true);
+            throw new Exception("amount must great than 0");
+         }
+
+         for (int i = 0; i < amount; i++)
+         {
+            String userNameTemp = (amount == 1) ? userName : userName + "_" + i;
+            orgService.getUserHandler().removeUser(userNameTemp, true);
          }
       }
       catch (Exception e)
       {
-         e.printStackTrace();
+         LOG.error(e.getMessage());
       }
       finally
       {
