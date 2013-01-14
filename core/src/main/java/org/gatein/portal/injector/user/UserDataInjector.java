@@ -1,3 +1,25 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2012, Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags. See the copyright.txt file in the
+ * distribution for a full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
 package org.gatein.portal.injector.user;
 
 import org.exoplatform.management.annotations.Impact;
@@ -14,6 +36,14 @@ import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.portal.injector.AbstractInjector;
 
+/**
+ * @author <a href="mailto:trongson.tran1228@gmail.com">Son Tran Trong</a>
+ * @version $Id$
+ * 
+ * The <code>UserDataInjector</code> class represents service generating and injecting users to GateIn.
+ * The service can be accessed via JMX (MBean: exo/userDataInject/portal/userInjector) or REST
+ *
+ */
 
 @Managed
 @ManagedDescription("User data injector")
@@ -67,54 +97,50 @@ public class UserDataInjector extends AbstractInjector
       }
    }
 
+   /**
+    * Generate users data for Gatein
+    * 
+    * @param userName
+    * The default userName
+    * 
+    * @param startIndex
+    * The startIndex and the endIndex are used to generate a number of users, such as userName_0, userName_1, userName_n
+    * 
+    * @param endIndex
+    * The end of index
+    * 
+    * @param password
+    * The password of user. If not set, it will be the default: 123456
+    */
    @Managed
    @ManagedDescription("Create amount of new users")
-   @Impact(ImpactType.WRITE)
-   public void createListUsers(@ManagedDescription("user name") @ManagedName("userName") String userName
-      ,@ManagedDescription("amount of users need to create") @ManagedName("amount") int amount
-      ,@ManagedDescription("if not specific it will be default 123456") @ManagedName("password") String password
-      ,@ManagedDescription("if amount > 1 email will be automatically asigned") @ManagedName("email") String email
-      ,@ManagedDescription("first name") @ManagedName("firstName") String firstName
-      ,@ManagedDescription("last name") @ManagedName("lastName") String lastName)
+   @Impact(ImpactType.READ)
+   public void createListUsers(@ManagedDescription("User name") @ManagedName("userName") String userName
+      ,@ManagedDescription("Starting index") @ManagedName("startIndex") String startIndex
+      ,@ManagedDescription("End index") @ManagedName("endIndex") String endIndex
+      ,@ManagedDescription("if not specific it will be default 123456") @ManagedName("password") String password)
    {
       startTransaction();
       try
       {
-         if (amount < 1)
+         if (password == null || password.trim().length() == 0)
          {
-            throw new Exception("amount must great than 0");
+            password = new String("123456");
          }
-
-         if (userName == null || userName.trim().length() == 0)
+         int sIndex = Integer.parseInt(startIndex);
+         int eIndex = Integer.parseInt(endIndex);
+         userName = userName.trim();
+         password = password.trim();
+         for (int i = sIndex; i <= eIndex; i++)
          {
-            throw new Exception("userName cannot be null or empty");
-         }
-
-         for (int i = 0; i < amount; i++)
-         {
-            String userNameTemp = (amount == 1) ? userName : userName + "_" + i;
-            if (password == null || password.trim().length() == 0)
-            {
-               password = new String("123456");
-            }
-            if (email == null || email.trim().length() == 0 || amount > 1)
-            {
-               email = new String(userNameTemp + "@localhost");
-            }
-            if (firstName == null || firstName.trim().length() == 0)
-            {
-               firstName = userNameTemp;
-            }
-            if (lastName == null || lastName.trim().length() == 0)
-            {
-               lastName = userNameTemp;
-            }
-            createUser(userNameTemp.trim(), password.trim(), email.trim(), firstName.trim(), lastName.trim());
+            String userNameTemp = userName + "_" + i;
+            createUser(userNameTemp, password, userNameTemp + "@localhost", userNameTemp, userNameTemp);
          }
       }
       catch (Exception e)
       {
-         LOG.error(e.getMessage());
+         e.printStackTrace();
+         LOG.error("Create users fail. Please check your inputs");
       }
       finally
       {
@@ -123,34 +149,41 @@ public class UserDataInjector extends AbstractInjector
 
    }
 
+   /**
+    * Remove a list of users
+    * 
+    * @param userName
+    * The default user name
+    * 
+    * @param startIndex
+    * The startIndex and the endIndex are used to generate a number of users that need to be removed, 
+    * such as userName_0, userName_1, userName_n.
+    * 
+    * @param endIndex
+    * The end of index
+    */
    @Managed
    @ManagedDescription("remove amount of users")
-   @Impact(ImpactType.WRITE)
+   @Impact(ImpactType.READ)
    public void removeListUsers(@ManagedDescription("user name") @ManagedName("userName") String userName
-      ,@ManagedDescription("list of userName_i need to remove with i form 0 to amount") @ManagedName("amount") int amount)
+      ,@ManagedDescription("Starting index") @ManagedName("startIndex") String startIndex
+      ,@ManagedDescription("End index") @ManagedName("endIndex") String endIndex)
    {
       startTransaction();
       try
       {
-         if (userName == null || userName.trim().length() == 0)
+         int sIndex = Integer.parseInt(startIndex);
+         int eIndex = Integer.parseInt(endIndex);
+         userName = userName.trim();
+         for (int i = sIndex; i <= eIndex; i++)
          {
-            throw new Exception("userName cannot be null or empty");
-         }
-
-         if (amount < 1)
-         {
-            throw new Exception("amount must great than 0");
-         }
-
-         for (int i = 0; i < amount; i++)
-         {
-            String userNameTemp = (amount == 1) ? userName : userName + "_" + i;
-            orgService.getUserHandler().removeUser(userNameTemp, true);
+            orgService.getUserHandler().removeUser(userName + "_" + i, true);
          }
       }
       catch (Exception e)
       {
-         LOG.error(e.getMessage());
+         e.printStackTrace();
+         LOG.error("Remove users fail. Please check your inputs");
       }
       finally
       {
