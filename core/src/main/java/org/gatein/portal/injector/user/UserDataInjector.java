@@ -67,34 +67,27 @@ public class UserDataInjector extends AbstractInjector
       return LOG;
    }
 
-   public void createUser(String userName, String password, String email, String firstName, String lastName)
+   public void createUser(String userName, String password, String email, String firstName, String lastName) throws Exception
    {
-      try
+      boolean newUser = false;
+      User user = orgService.getUserHandler().findUserByName(userName);
+      if (user == null)
       {
-         boolean newUser = false;
-         User user = orgService.getUserHandler().findUserByName(userName);
-         if (user == null)
-         {
-            user = orgService.getUserHandler().createUserInstance(userName);
-            newUser = true;
-         }
-         user.setPassword(password);
-         user.setEmail(email);
-         user.setFirstName(firstName);
-         user.setLastName(lastName);
-
-         if (newUser)
-         {
-            orgService.getUserHandler().createUser(user, true);
-            return;
-
-         }
-         orgService.getUserHandler().saveUser(user, true);
+         user = orgService.getUserHandler().createUserInstance(userName);
+         newUser = true;
       }
-      catch (Exception e)
+      user.setPassword(password);
+      user.setEmail(email);
+      user.setFirstName(firstName);
+      user.setLastName(lastName);
+
+      if (newUser)
       {
-         e.printStackTrace();
+         orgService.getUserHandler().createUser(user, true);
+         return;
+
       }
+      orgService.getUserHandler().saveUser(user, true);
    }
 
    /**

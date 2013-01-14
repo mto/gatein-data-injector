@@ -122,6 +122,8 @@ public class MembershipDataInjector extends AbstractInjector
       }
       catch (Exception e)
       {
+         e.printStackTrace();
+         LOG.error("Create memberships fail. Please check your inputs");
       }
       finally
       {
@@ -169,6 +171,8 @@ public class MembershipDataInjector extends AbstractInjector
       }
       catch (Exception e)
       {
+         e.printStackTrace();
+         LOG.error("Remove memberships fail. Please check your inputs");
       }
       finally
       {

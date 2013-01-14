@@ -118,11 +118,12 @@ public class GroupDataInjector extends AbstractInjector
       ,@ManagedDescription("Parent group name") @ManagedName("parentName") String parentName
       ,@ManagedDescription("Starting index") @ManagedName("startIndex") String startIndex
       ,@ManagedDescription("End index") @ManagedName("endIndex") String endIndex
-      ,@ManagedDescription("Creating parent if it doesn't exist") @ManagedName("createParent") boolean createParent)
+      ,@ManagedDescription("Creating parent if it doesn't exist") @ManagedName("createParent") String createParent)
    {
       startTransaction();
       try
       {
+         boolean allowCreateParent = Boolean.parseBoolean(createParent);
          groupName = groupName.trim();
          if (groupName.length() == 0)
          {
@@ -139,7 +140,7 @@ public class GroupDataInjector extends AbstractInjector
             Group parentGrop = orgService.getGroupHandler().findGroupById("/" + parentName);
             if (parentGrop == null)
             {
-               if (createParent)
+               if (allowCreateParent)
                {
                   createGrop(null, parentName, parentName, parentName);
                }
@@ -194,11 +195,12 @@ public class GroupDataInjector extends AbstractInjector
       ,@ManagedDescription("Parent group name") @ManagedName("parentName") String parentName
       ,@ManagedDescription("Starting index") @ManagedName("startIndex") String startIndex
       ,@ManagedDescription("End index") @ManagedName("endIndex") String endIndex
-      ,@ManagedDescription("Alow to delete parent") @ManagedName("deleteParent") boolean deleteParent) 
+      ,@ManagedDescription("Alow to delete parent") @ManagedName("deleteParent") String deleteParent) 
    {
       startTransaction();
       try
       {
+         boolean allowDeleteParent = Boolean.parseBoolean(deleteParent);
          groupName = groupName.trim();
          if (groupName.length() == 0)
          {
@@ -222,7 +224,7 @@ public class GroupDataInjector extends AbstractInjector
                groupHandler.removeGroup(group, true);
          }
 
-         if (parentName != null && deleteParent)
+         if (parentName != null && allowDeleteParent)
          {
             Group group = groupHandler.findGroupById("/" + parentName);
             if (group != null)
