@@ -33,7 +33,6 @@ import org.exoplatform.portal.mop.navigation.GenericScope;
 import org.exoplatform.portal.mop.navigation.NavigationContext;
 import org.exoplatform.portal.mop.navigation.NavigationServiceWrapper;
 import org.exoplatform.portal.mop.navigation.NavigationState;
-import org.exoplatform.portal.mop.navigation.NodeContext;
 import org.exoplatform.portal.mop.navigation.Scope;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
@@ -247,14 +246,16 @@ public class NavigationDataInjector extends AbstractInjector
    public void createNavs(@ManagedDescription("Type of new navigation") @ManagedName("navType") String type,
                           @ManagedDescription("Owner of new navigation") @ManagedName("navOwner") String owner,
                           @ManagedDescription("Prefix of new node names") @ManagedName("prefix") String prefix,
-                          @ManagedDescription("Starting index") @ManagedName("startIndex") int startIndex,
-                          @ManagedDescription("Ending index") @ManagedName("endIndex") int endIndex)
+                          @ManagedDescription("Starting index") @ManagedName("startIndex") String startIndex,
+                          @ManagedDescription("Ending index") @ManagedName("endIndex") String endIndex)
    {
+      int _startIndex = Integer.parseInt(startIndex);
+      int _endIndex = Integer.parseInt(endIndex);
       //Invoke from JMX bean will not go through GateIn's servlet filter. Therefore, we need to open/close transaction
       try
       {
          startTransaction();
-         createNavigation(type, owner, prefix, startIndex, endIndex);
+         createNavigation(type, owner, prefix, _startIndex, _endIndex);
       }
       catch (Exception ex)
       {
@@ -272,14 +273,16 @@ public class NavigationDataInjector extends AbstractInjector
    public void insertNodes(@ManagedDescription("Type of target navigation") @ManagedName("navType") String navType,
                            @ManagedDescription("Owner of target navigation") @ManagedName("navOwner") String navOwner,
                            @ManagedDescription("Prefix of new node names") @ManagedName("prefix") String nodePrefix,
-                           @ManagedDescription("Starting index") @ManagedName("startIndex") int startIndex,
-                           @ManagedDescription("Ending index") @ManagedName("endIndex") int endIndex)
+                           @ManagedDescription("Starting index") @ManagedName("startIndex") String startIndex,
+                           @ManagedDescription("Ending index") @ManagedName("endIndex") String endIndex)
    {
+      int _startIndex = Integer.parseInt(startIndex);
+      int _endIndex = Integer.parseInt(endIndex);
       //Invoke from JMX bean will not go through GateIn's servlet filter. Therefore, we need to open/close transaction
       try
       {
          startTransaction();
-         addNodes(navType, navOwner, nodePrefix, startIndex, endIndex);
+         addNodes(navType, navOwner, nodePrefix, _startIndex, _endIndex);
       }
       catch (Exception ex)
       {
@@ -298,14 +301,16 @@ public class NavigationDataInjector extends AbstractInjector
                            @ManagedDescription("Owner of target navigation") @ManagedName("navOwner") String navOwner,
                            @ManagedDescription("Path from root to target node") @ManagedName("absolutePath") String absolutePath,
                            @ManagedDescription("Prefix of new node names") @ManagedName("prefix") String nodePrefix,
-                           @ManagedDescription("Starting index") @ManagedName("startIndex") int startIndex,
-                           @ManagedDescription("Ending index") @ManagedName("endIndex") int endIndex)
+                           @ManagedDescription("Starting index") @ManagedName("startIndex") String startIndex,
+                           @ManagedDescription("Ending index") @ManagedName("endIndex") String endIndex)
    {
+      int _startIndex = Integer.parseInt(startIndex);
+      int _endIndex = Integer.parseInt(endIndex);
       //Invoke from JMX bean will not go through GateIn's servlet filter. Therefore, we need to open/close transaction
       try
       {
          startTransaction();
-         addNodes(navType, navOwner, absolutePath, nodePrefix, startIndex, endIndex);
+         addNodes(navType, navOwner, absolutePath, nodePrefix, _startIndex, _endIndex);
       }
       catch (Exception ex)
       {
