@@ -38,6 +38,7 @@ import org.exoplatform.portal.mop.page.PageState;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.portal.injector.AbstractInjector;
+
 import java.util.Collections;
 
 /**
@@ -94,21 +95,24 @@ public class PageDataInjector extends AbstractInjector
     */
    @Managed
    @ManagedDescription("Create new pages")
-   @Impact(ImpactType.WRITE)
+   @Impact(ImpactType.READ)
    public void createPages(
            @ManagedDescription("Site type of page") @ManagedName("siteType") String type, 
            @ManagedDescription("Site name of page") @ManagedName("siteName") String name,
            @ManagedDescription("Page name prefix") @ManagedName("pageNamePrefix") String pageNamePrefix, 
            @ManagedDescription("Page title prefix") @ManagedName("pageTitlePrefix") String pageTitlePrefix,
-           @ManagedDescription("Starting index") @ManagedName("startIndex") int startIndex,
-           @ManagedDescription("Ending index") @ManagedName("endIndex") int endIndex)
+           @ManagedDescription("Starting index") @ManagedName("startIndex") String startIndex,
+           @ManagedDescription("Ending index") @ManagedName("endIndex") String endIndex)
    {
       try
       {
          startTransaction();
          SiteType siteType = SiteType.valueOf(type.toUpperCase());
          SiteKey siteKey = siteType.key(name);
-         for (int i = startIndex; i < endIndex; i++)
+         int start = Integer.parseInt(startIndex);
+         int end = Integer.parseInt(endIndex);
+         
+         for (int i = start; i < end; i++)
          {
             PageContext page = new PageContext(siteKey.page(pageNamePrefix + "_" + i), new PageState(pageTitlePrefix + "_"
                + i, null, true, null, Collections.<String>emptyList(), null));
