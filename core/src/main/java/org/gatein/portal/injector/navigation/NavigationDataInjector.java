@@ -319,7 +319,9 @@ public class NavigationDataInjector extends AbstractInjector
 
    @Managed
    @ManagedDescription("Delete node specified by path in existing navigation")
-   public void deleteNode(String navType, String navOwner, String pathFromRoot)
+   public void deleteNode(@ManagedDescription("Type of target navigation") @ManagedName("navType") String navType,
+                          @ManagedDescription("Owner of target navigation") @ManagedName("navOwner") String navOwner,
+                          @ManagedDescription("Path from root to target node") @ManagedName("pathFromRoot") String pathFromRoot)
    {
       try
       {
