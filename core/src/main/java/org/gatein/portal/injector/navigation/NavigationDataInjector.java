@@ -242,7 +242,7 @@ public class NavigationDataInjector extends AbstractInjector
 
    @Managed
    @ManagedDescription("Create new navigation")
-   @Impact(ImpactType.WRITE)
+   @Impact(ImpactType.READ)
    public void createNavs(@ManagedDescription("Type of new navigation") @ManagedName("navType") String type,
                           @ManagedDescription("Owner of new navigation") @ManagedName("navOwner") String owner,
                           @ManagedDescription("Prefix of new node names") @ManagedName("prefix") String prefix,
@@ -269,7 +269,7 @@ public class NavigationDataInjector extends AbstractInjector
 
    @Managed
    @ManagedDescription("Add nodes into root node of existing navigation")
-   @Impact(ImpactType.WRITE)
+   @Impact(ImpactType.READ)
    public void insertNodes(@ManagedDescription("Type of target navigation") @ManagedName("navType") String navType,
                            @ManagedDescription("Owner of target navigation") @ManagedName("navOwner") String navOwner,
                            @ManagedDescription("Prefix of new node names") @ManagedName("prefix") String nodePrefix,
@@ -296,7 +296,7 @@ public class NavigationDataInjector extends AbstractInjector
 
    @Managed
    @ManagedDescription("Add nodes into node specified by path in existing navigation")
-   @Impact(ImpactType.WRITE)
+   @Impact(ImpactType.READ)
    public void insertNodes(@ManagedDescription("Type of target navigation") @ManagedName("navType") String navType,
                            @ManagedDescription("Owner of target navigation") @ManagedName("navOwner") String navOwner,
                            @ManagedDescription("Path from root to target node") @ManagedName("absolutePath") String absolutePath,
@@ -324,6 +324,7 @@ public class NavigationDataInjector extends AbstractInjector
 
    @Managed
    @ManagedDescription("Delete node specified by path in existing navigation")
+   @Impact(ImpactType.READ)
    public void deleteNode(@ManagedDescription("Type of target navigation") @ManagedName("navType") String navType,
                           @ManagedDescription("Owner of target navigation") @ManagedName("navOwner") String navOwner,
                           @ManagedDescription("Path from root to target node") @ManagedName("pathFromRoot") String pathFromRoot)
