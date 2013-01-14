@@ -28,6 +28,7 @@ Service components are exoposed as JMX beans and REST endpoints. Users could int
 ### Create new navigations with page nodes
 
 Method: createNavs
+
 Params: navType, navOwner, prefix, startIndex, endIndex
 
 Ex: Invoking createNavs with navType=portal, navOwner=testClassic, prefix=testNode, startIndex=0, endIndex=100 would create a new
@@ -36,6 +37,7 @@ navigation named _testClassic_ of type _portal_ and inject 100 children named (t
 ### Insert nodes into root node of existing navigation
 
 Method: insertNodes
+
 Params: navType, navOwner, prefix, startIndex, endIndex
 
 Ex: Invoking insertNodes with navType=portal, navOwner=classic, prefix=testNode, startIndex=0, endIndex=100 would inject 100 children named (testNode_0, testNode_1,..., testNode_99) to root
@@ -44,6 +46,7 @@ node of navigation determined by type=portal, owner=classic
 ### Insert nodes into node specified by path from root node of existing navigation
 
 Method: insertNodes
+
 Params: navType, navOwner, absolutePath, prefix, startIndex, endIndex
 
 Ex: Invoking insertNodes with navType=portal, navOwner=classic, absolutePath=level_0/level_1, prefix=testNode, startIndex=0, endIndex=100 would inject 100 children named (testNode_0, testNode_1,..., testNode_99) to
@@ -52,6 +55,7 @@ node specified by path level_0/level_1 under navigation (type=portal, owner=clas
 ### Delete node specified by path from root node of existing navigation
 
 Method: deleteNode
+
 Params: navType, navOwner, absolutePath
 
 Ex: Invoking deleteNode with navType=portal, navOwner=classic, pathFromRoot=level_0/level_1 would delete node specified by path level_0/level_1 under navigation (type=portal, owner=classic)
