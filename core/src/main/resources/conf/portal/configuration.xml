@@ -41,4 +41,7 @@
     <type>org.gatein.portal.injector.group.GroupDataInjector</type>
   </component>
   
+  <component>
+  	<type>org.gatein.portal.injector.membership.MembershipDataInjector</type>
+  </component>
 </configuration>
