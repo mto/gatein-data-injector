@@ -102,7 +102,6 @@ public class MembershipDataInjector extends AbstractInjector
       ,@ManagedDescription("Starting index") @ManagedName("startIndex")  String startIndex
       ,@ManagedDescription("End index") @ManagedName("endIndex")  String endIndex)
    {
-      startTransaction();
       try
       {
          if (membershipName == null || membershipName.trim().length() == 0)
@@ -113,7 +112,7 @@ public class MembershipDataInjector extends AbstractInjector
          int sIndex = Integer.parseInt(startIndex);
          int eIndex = Integer.parseInt(endIndex);
          membershipName = membershipName.trim();
-         
+         startTransaction();
          for (int i = sIndex; i <= eIndex; i++)
          {
             String membershipNameTemp = membershipName + "_" + i;
@@ -151,7 +150,6 @@ public class MembershipDataInjector extends AbstractInjector
       ,@ManagedDescription("Starting index") @ManagedName("startIndex") String startIndex
       ,@ManagedDescription("End index") @ManagedName("endIndex") String endIndex)
    {
-      startTransaction();
       try
       {
          if (membershipName == null || membershipName.trim().length() == 0)
@@ -162,7 +160,7 @@ public class MembershipDataInjector extends AbstractInjector
          int sIndex = Integer.parseInt(startIndex);
          int eIndex = Integer.parseInt(endIndex);
          membershipName = membershipName.trim();
-         
+         startTransaction();
          for (int i = sIndex; i <= eIndex; i++)
          {
             String membershipNameTemp = membershipName + "_" + i;

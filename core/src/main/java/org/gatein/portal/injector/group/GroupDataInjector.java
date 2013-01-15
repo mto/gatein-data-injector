@@ -120,7 +120,6 @@ public class GroupDataInjector extends AbstractInjector
       ,@ManagedDescription("End index") @ManagedName("endIndex") String endIndex
       ,@ManagedDescription("Creating parent if it doesn't exist") @ManagedName("createParent") String createParent)
    {
-      startTransaction();
       try
       {
          boolean allowCreateParent = Boolean.parseBoolean(createParent);
@@ -129,7 +128,9 @@ public class GroupDataInjector extends AbstractInjector
          {
             LOG.error("groupName cannot be null or empty");
          }
-
+         int sIndex = Integer.parseInt(startIndex);
+         int eIndex = Integer.parseInt(endIndex);
+         startTransaction();
          if (parentName == null || parentName.trim().length() == 0)
          {
             parentName = null;
@@ -151,8 +152,6 @@ public class GroupDataInjector extends AbstractInjector
                }
             }
          }
-         int sIndex = Integer.parseInt(startIndex);
-         int eIndex = Integer.parseInt(endIndex);
          for (int i = sIndex; i <= eIndex; i++)
          {
             createGrop(parentName, groupName + "_" + i, groupName + "_" + i, groupName + "_" + i);
@@ -197,7 +196,6 @@ public class GroupDataInjector extends AbstractInjector
       ,@ManagedDescription("End index") @ManagedName("endIndex") String endIndex
       ,@ManagedDescription("Alow to delete parent") @ManagedName("deleteParent") String deleteParent) 
    {
-      startTransaction();
       try
       {
          boolean allowDeleteParent = Boolean.parseBoolean(deleteParent);
@@ -217,6 +215,7 @@ public class GroupDataInjector extends AbstractInjector
          }
          int sIndex = Integer.parseInt(startIndex);
          int eIndex = Integer.parseInt(endIndex);
+         startTransaction();
          for (int i = sIndex; i <= eIndex; i++)
          {
             Group group = groupHandler.findGroupById(groupName + "_" + i);
@@ -270,7 +269,6 @@ public class GroupDataInjector extends AbstractInjector
       ,@ManagedDescription("The starting index") @ManagedName("startIndex") String startIndex
       ,@ManagedDescription("The end of index") @ManagedName("endIndex") String endIndex) 
    {
-      startTransaction();
       try
       {
          Group group = groupHandler.findGroupById(groupName);
@@ -286,7 +284,7 @@ public class GroupDataInjector extends AbstractInjector
 
          int sIndex = Integer.parseInt(startIndex);
          int eIndex = Integer.parseInt(endIndex);
-
+         startTransaction();
          for (int i = sIndex; i <= eIndex; i++)
          {
             User user = orgService.getUserHandler().findUserByName(userName + "_" + i);
@@ -339,7 +337,6 @@ public class GroupDataInjector extends AbstractInjector
       ,@ManagedDescription("The starting index") @ManagedName("startIndex") String startIndex
       ,@ManagedDescription("The end of index") @ManagedName("endIndex") String endIndex)
    {
-      startTransaction();
       try
       {
          groupName = groupName.trim();
@@ -348,7 +345,7 @@ public class GroupDataInjector extends AbstractInjector
 
          int sIndex = Integer.parseInt(startIndex);
          int eIndex = Integer.parseInt(endIndex);
-
+         startTransaction();
          for (int i = sIndex; i <= eIndex; i++)
          {
             StringBuffer sb = new StringBuffer();

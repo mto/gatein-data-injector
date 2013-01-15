@@ -113,7 +113,6 @@ public class UserDataInjector extends AbstractInjector
       ,@ManagedDescription("End index") @ManagedName("endIndex") String endIndex
       ,@ManagedDescription("if not specific it will be default 123456") @ManagedName("password") String password)
    {
-      startTransaction();
       try
       {
          if (password == null || password.trim().length() == 0)
@@ -124,6 +123,7 @@ public class UserDataInjector extends AbstractInjector
          int eIndex = Integer.parseInt(endIndex);
          userName = userName.trim();
          password = password.trim();
+         startTransaction();
          for (int i = sIndex; i <= eIndex; i++)
          {
             String userNameTemp = userName + "_" + i;
@@ -162,12 +162,12 @@ public class UserDataInjector extends AbstractInjector
       ,@ManagedDescription("Starting index") @ManagedName("startIndex") String startIndex
       ,@ManagedDescription("End index") @ManagedName("endIndex") String endIndex)
    {
-      startTransaction();
       try
       {
          int sIndex = Integer.parseInt(startIndex);
          int eIndex = Integer.parseInt(endIndex);
          userName = userName.trim();
+         startTransaction();
          for (int i = sIndex; i <= eIndex; i++)
          {
             orgService.getUserHandler().removeUser(userName + "_" + i, true);
