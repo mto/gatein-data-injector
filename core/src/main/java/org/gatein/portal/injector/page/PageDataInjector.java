@@ -33,6 +33,7 @@ import org.exoplatform.management.rest.annotations.RESTEndpoint;
 import org.exoplatform.portal.mop.SiteKey;
 import org.exoplatform.portal.mop.SiteType;
 import org.exoplatform.portal.mop.page.PageContext;
+import org.exoplatform.portal.mop.page.PageKey;
 import org.exoplatform.portal.mop.page.PageService;
 import org.exoplatform.portal.mop.page.PageState;
 import org.gatein.common.logging.Logger;
@@ -44,7 +45,7 @@ import java.util.Collections;
 /**
  * @author <a href="mailto:haithanh0809@gmail.com">Hai Thanh Nguyen</a>
  * @version $Id$
- * 
+ *
  * The <code>PageDataInjector</code> class represents service generating and injecting page to GateIn.
  * The service can be accessed via JMX (MBean: exo/pageInject/pageInjector) or REST
  *
@@ -74,22 +75,22 @@ public class PageDataInjector extends AbstractInjector
 
    /**
     * Generate and inject pages to specified site
-    * 
-    * @param type 
+    *
+    * @param type
     * The type of site (ex: portal, group, user)
-    * 
+    *
     * @param name
     * The name of site
-    * 
+    *
     * @param pageNamePrefix
     * The prefix name for page
-    * 
+    *
     * @param pageTitlePrefix
     * The prefix title for page
-    * 
+    *
     * @param startIndex
     * The start of index to identify page
-    * 
+    *
     * @param endIndex
     * The end of index
     */
@@ -97,12 +98,12 @@ public class PageDataInjector extends AbstractInjector
    @ManagedDescription("Create new pages")
    @Impact(ImpactType.READ)
    public void createPages(
-           @ManagedDescription("Site type of page") @ManagedName("siteType") String type, 
-           @ManagedDescription("Site name of page") @ManagedName("siteName") String name,
-           @ManagedDescription("Page name prefix") @ManagedName("pageNamePrefix") String pageNamePrefix, 
-           @ManagedDescription("Page title prefix") @ManagedName("pageTitlePrefix") String pageTitlePrefix,
-           @ManagedDescription("Starting index") @ManagedName("startIndex") String startIndex,
-           @ManagedDescription("Ending index") @ManagedName("endIndex") String endIndex)
+      @ManagedDescription("Site type of page") @ManagedName("siteType") String type,
+      @ManagedDescription("Site name of page") @ManagedName("siteName") String name,
+      @ManagedDescription("Page name prefix") @ManagedName("pageNamePrefix") String pageNamePrefix,
+      @ManagedDescription("Page title prefix") @ManagedName("pageTitlePrefix") String pageTitlePrefix,
+      @ManagedDescription("Starting index") @ManagedName("startIndex") String startIndex,
+      @ManagedDescription("Ending index") @ManagedName("endIndex") String endIndex)
    {
       try
       {
@@ -111,7 +112,7 @@ public class PageDataInjector extends AbstractInjector
          SiteKey siteKey = siteType.key(name);
          int start = Integer.parseInt(startIndex);
          int end = Integer.parseInt(endIndex);
-         
+
          for (int i = start; i < end; i++)
          {
             PageContext page = new PageContext(siteKey.page(pageNamePrefix + "_" + i), new PageState(pageTitlePrefix + "_"
@@ -122,6 +123,38 @@ public class PageDataInjector extends AbstractInjector
       catch (Exception e)
       {
          LOG.error("Failed to create new page", e);
+      }
+      finally
+      {
+         endTransaction();
+      }
+   }
+
+   @Managed
+   @ManagedDescription("Remove pages")
+   @Impact(ImpactType.READ)
+   public void removePages(@ManagedDescription("Site type of page") @ManagedName("siteType") String siteType,
+                           @ManagedDescription("Site name of page") @ManagedName("siteName") String siteName,
+                           @ManagedDescription("Page name prefix") @ManagedName("pageNamePrefix") String pageNamePrefix,
+                           @ManagedDescription("Starting index") @ManagedName("startIndex") String startIndex,
+                           @ManagedDescription("Ending index") @ManagedName("endIndex") String endIndex)
+   {
+      try
+      {
+         int _startIndex = Integer.parseInt(startIndex);
+         int _endIndex = Integer.parseInt(endIndex);
+         SiteType type = SiteType.valueOf(siteType.toUpperCase());
+         SiteKey key = type.key(siteName);
+
+         startTransaction();
+         for (int i = _startIndex; i < _endIndex; i++)
+         {
+            pageService.destroyPage(new PageKey(key, pageNamePrefix + "_" + i));
+         }
+      }
+      catch (Exception ex)
+      {
+         LOG.error("Failed to destroy pages", ex);
       }
       finally
       {

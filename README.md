@@ -86,10 +86,20 @@ To delete node specified by path level_0/level_1 under navigation (type=portal, 
 * Method: createPages
 * Params: siteType, siteName, pageNamePrefix, pageTitlePrefix, startIndex, endIndex
 
-To generate 100 pages(foo_1, foo_2,...,foo_99) whose ownerType is _portal_ and ownerId is _classic_
+To generate 100 pages(foo_0, foo_1,...,foo_99) whose ownerType is _portal_ and ownerId is _classic_
 
 * Invoking createPages with siteType=portal, siteName=classic, pageNamePrefix=foo, pageTitlePrefix=foo_title, startIndex=0, endIndex=100
 * Send HTTP GET request _http://localhost:8080/portal/rest/management/pageInjector/createPages?siteType=portal&siteName=classic&pageNamePrefix=foo&pageTitlePrefix=foo_title&startIndex=0&endIndex=100_
+
+#### _2.2. Remove pages_
+
+* Method: createPages
+* Params: siteType, siteName, pageNamePrefix, startIndex, endIndex
+
+To remove 100 pages(foo_0, foo_1,...,foo_99) whose ownerType is _portal_ and ownerId is _classic_
+
+* Invoking removePages with siteType=portal, siteName=classic, pageNamePrefix=foo, startIndex=0, endIndex=100
+* Send HTTP GET request _http://localhost:8080/portal/rest/management/pageInjector/removePages?siteType=portal&siteName=classic&pageNamePrefix=foo&startIndex=0&endIndex=100_
 
 ### 3. Organization data
 
